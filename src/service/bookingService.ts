@@ -1,3 +1,4 @@
+import { BookingStatus } from "../enum/bookingStatus";
 import { Booking } from "../model/booking";
 import { Slot } from "../model/slot";
 import { RepositoryDataManipulation } from "../repository/repositoryDataManipulation";
@@ -13,7 +14,7 @@ export class BookingService {
         let bookingList = this.repositoryDataManipulation.listBookings()
         let flag = false
         bookingList.filter((value: Booking) => {
-            if (value.userId == userId && value.slotTime == slotTime && value.conferenceRoom.conferenceRoomId == conferenceRoomId  && value.conferenceRoom.floorId==floorId && value.conferenceRoom.buildingId == buildingId) 
+            if (value.userId == userId && value.slotTime == slotTime && value.conferenceRoom.conferenceRoomId == conferenceRoomId  && value.conferenceRoom.floorId==floorId && value.conferenceRoom.buildingId == buildingId && value.bookingStatus == BookingStatus.ACTIVE) 
                 flag = true
         })
 
@@ -27,9 +28,21 @@ export class BookingService {
         return 'Successfully added conference'
     }
 
+    bookingAlreadyCancelled(userId: string, slotTime: string,conferenceRoomId: string,floorId: string, buildingId: string) {
+
+        let bookingList = this.repositoryDataManipulation.listBookings()
+        let flag = false
+        bookingList.filter((value: Booking) => {
+            if (value.userId == userId && value.slotTime == slotTime && value.conferenceRoom.conferenceRoomId == conferenceRoomId  && value.conferenceRoom.floorId==floorId && value.conferenceRoom.buildingId == buildingId && value.bookingStatus == BookingStatus.CANCEL) 
+                flag = true
+        })
+
+        return flag ? true : false
+    }
+
     cancelBooking(userId: string, slotTime: string,conferenceRoomId: string,floorId: string,buildingId: string){
 
-        this.cancelBooking(userId,slotTime,conferenceRoomId,floorId,buildingId)
+        this.repositoryDataManipulation.cancelBooking(userId,slotTime,conferenceRoomId,floorId,buildingId)
 
         return 'Successfully cancelled booking'
     }

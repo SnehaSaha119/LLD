@@ -21,7 +21,12 @@ const userInput = ['ADD USER U1', 'ADD USER U2',
         'ADD BUILDING B1','ADD BUILDING B2',
         'ADD FLOOR B1 F1','ADD FLOOR B1 F2','ADD FLOOR B2 F1',
         'ADD CONFROOM B1 F1 C1', 'ADD CONFROOM B1 F1 C2','ADD CONFROOM B1 F2 C1','ADD CONFROOM B2 F1 C1',
-        'BOOK U1 8-9 C1 F1 B1','BOOK U1 8-9 C2 F1 B1','BOOK U1 8-9 C1 F2 B1','BOOK U1 8-9 C1 F2 B1',
+        'BOOK U1 8-9 B1 F1 C1','BOOK U1 8-9 B1 F1 C2','BOOK U1 8-9 B1 F2 C1',
+        'BOOK U1 8-9 B1 F2 C1',
+        'SEARCH 8-9 B1 F2',
+        'CANCEL U1 8-9 B1 F2 C1',
+        'SEARCH 8-9 B1 F2',
+        'BOOK U1 8-9 C1 F2 B1',
         'LIST BOOKING U1 B1 F1',
         'SEARCH 8-9 B1 F1',
         'SEARCH 10-11 B1 F1',
@@ -39,75 +44,84 @@ while(userInput[i]!='EXIT'){
             case 'USER':
                 
                 if(userService.userExists((inputs[2]))){
-                    console.log(`User already exists ${inputs[2]}`)
+                    console.log(` --User already exists ${inputs[2]}`)
                 }
         
                 userService.addUser(inputs[2])
                 
-                console.log(`Added user ${inputs[2]} with logs`)
+                console.log(` --Added user ${inputs[2]}`)
                 break;
 
             case 'BUILDING':
                 
                 if(buildingService.buildingExists((inputs[2]))){
-                    console.log(`Building already exists ${inputs[2]}`)
+                    console.log(` --Building already exists ${inputs[2]}`)
                 }
         
                 buildingService.addBuilding(inputs[2])
                 
-                console.log(`Added building ${inputs[2]}`)
+                console.log(` --Added building ${inputs[2]}`)
                 break;
 
             case 'FLOOR':
 
                 if(floorService.floorExists(inputs[3],inputs[2])){
-                    console.log(`Floor already exists ${inputs[2]}`)
+                    console.log(` --Floor already exists ${inputs[2]}`)
                 }
         
                 floorService.addFloor(inputs[3],inputs[2])
                 
-                console.log(`Added floor ${inputs[3]} in building ${inputs[2]}`)
+                console.log(` --Added floor ${inputs[3]} in building ${inputs[2]}`)
                 break;
 
             case 'CONFROOM':
 
                 if(conferenceService.conferenceExists(inputs[4],inputs[3],inputs[2])){
-                    console.log(`Conference already exists ${inputs[4]}`)
+                    console.log(` --Conference already exists ${inputs[4]}`)
                 }
         
                 conferenceService.addConference(inputs[4],inputs[3],inputs[2])
                 
-                console.log(`Added conference ${inputs[4]} for floor ${inputs[3]} in building ${inputs[2]}`)
+                console.log(` --Added conference ${inputs[4]} for floor ${inputs[3]} in building ${inputs[2]}`)
                 break;
 
             case 'SLOT':
 
                 if(slotService.slotExists(inputs[2])){
-                    console.log(`Slot already exists ${inputs[2]}`)
+                    console.log(` --Slot already exists ${inputs[2]}`)
                 }
 
                 slotService.addSlot(inputs[2])
-                console.log(`Added slot ${inputs[2]}`)
+                console.log(` --Added slot ${inputs[2]}`)
                 break;
 
             default:
-                console.log(`Wrong input : ${inputs[1]} `)
+                console.log(` --Wrong input : ${inputs[1]} `)
                 break;
         }
     }else if(inputs[0] == 'BOOK'){
 
-        if(bookingService.bookingExists(inputs[1],inputs[2],inputs[3],inputs[4],inputs[5])){
-            console.log(`Conference already exists`)
+        if(bookingService.bookingExists(inputs[1],inputs[2],inputs[5],inputs[4],inputs[3])){
+            console.log(` --Booking already exists`)
         }else{
-            bookingService.addBooking(inputs[1],inputs[2],inputs[3],inputs[4],inputs[5])
-            console.log(`Booked conference room for user ${inputs[1]} slot ${inputs[2]} conference room ${inputs[3]} floor ${inputs[4]} building ${inputs[5]} `)
+            bookingService.addBooking(inputs[1],inputs[2],inputs[5],inputs[4],inputs[3])
+            console.log(` --Booked conference room for user ${inputs[1]} slot ${inputs[2]} conference room ${inputs[5]} floor ${inputs[4]} building ${inputs[3]} `)
         }
         
     }else if(inputs[0] == 'CANCEL'){
 
+        if(bookingService.bookingAlreadyCancelled(inputs[1],inputs[2],inputs[5],inputs[4],inputs[3])){
+            console.log(` --Booking already cancelled`)
+        }else if(!bookingService.bookingExists(inputs[1],inputs[2],inputs[5],inputs[4],inputs[3])){
+            console.log(` --Booking doesnt exists to cancel`)
+        }else{
+            let result = bookingService.cancelBooking(inputs[1],inputs[2],inputs[5],inputs[4],inputs[3])
+            console.log(` --${result} of conference room for user ${inputs[1]} slot ${inputs[2]} conference room ${inputs[5]} floor ${inputs[4]} building ${inputs[3]} `)
+        }
+
     }else if(inputs[0] == 'LIST'){
         let result = bookingService.listBookingByUser(inputs[2],inputs[4],inputs[3])
-        console.log(`----all the bookings by user ${inputs[2]}------`)
+        console.log(` ------all the bookings by user ${inputs[2]}------`)
         result.forEach((value)=>{
             console.log(value.slotTime," ",value.conferenceRoom.floorId," ",value.conferenceRoom.buildingId," ",value.conferenceRoom.conferenceRoomId)
         })
@@ -115,15 +129,15 @@ while(userInput[i]!='EXIT'){
 
         let result = conferenceService.listConferencesBySlot(inputs[1],inputs[3],inputs [2])
         if(result.length==0) console.log("No rooms available")
-        else console.log(`----all the rooms available------`,result)
+        else console.log(` ------all the rooms available------`,result)
     }
 
-    console.log("******Users******",repositoryDataManipulation.listUsers())
-    console.log("******Slots******",repositoryDataManipulation.listSlots())
-    console.log("******Buidings******",repositoryDataManipulation.listBuildings())
-    console.log("******Floors******",repositoryDataManipulation.listFloors())
-    console.log("******Conference******",repositoryDataManipulation.listConferences())
-    console.log("******Bookings******",repositoryDataManipulation.listBookings())
+    // console.log("******Users******",repositoryDataManipulation.listUsers())
+    // console.log("******Slots******",repositoryDataManipulation.listSlots())
+    // console.log("******Buidings******",repositoryDataManipulation.listBuildings())
+    // console.log("******Floors******",repositoryDataManipulation.listFloors())
+    // console.log("******Conference******",repositoryDataManipulation.listConferences())
+    // console.log("******Bookings******",repositoryDataManipulation.listBookings())
 
     i++
 }

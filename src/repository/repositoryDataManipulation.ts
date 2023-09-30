@@ -1,3 +1,4 @@
+import { BookingStatus } from "../enum/bookingStatus";
 import { Booking } from "../model/booking";
 import { Building } from "../model/building";
 import { Conference } from "../model/conference";
@@ -138,13 +139,22 @@ export class RepositoryDataManipulation {
 
         //Update confernce list
         this.conferences.forEach((conference)=>{
-            if(conference.conferenceRoomId == conferenceRoomId)
+            if(conference.conferenceRoomId == conferenceRoomId && conference.floorId == floorId && conference.buildingId == buildingId)
                 conference.bookedSlot[slotTime]=slotTime
         })
     }
 
-    deleteBooking(){
+    cancelBooking(userId: string,slotTime:string,conferenceRoomId: string,floorId: string,buildingId: string){
+        this.bookings.forEach((booking)=>{
+            if(booking.userId == userId && booking.slotTime == slotTime && booking.conferenceRoom.conferenceRoomId == conferenceRoomId && booking.conferenceRoom.floorId == floorId && booking.conferenceRoom.buildingId == buildingId && booking.bookingStatus == BookingStatus.ACTIVE)
+                booking.bookingStatus = BookingStatus.CANCEL
+        })
 
+        //update conference list
+        this.conferences.forEach((conference)=>{
+            if(conference.conferenceRoomId == conferenceRoomId && conference.floorId == floorId && conference.buildingId == buildingId)
+                delete conference.bookedSlot[slotTime]
+        })
     }
 
     listBookings(){

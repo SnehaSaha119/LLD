@@ -12,7 +12,7 @@ export class ConferenceService {
         let conferenceList = this.repositoryDataManipulation.listConferences()
         let flag = false
         conferenceList.filter((value: Conference) => {
-            if (value.conferenceRoomId == conferenceRoomId  && value.floorId==floorId && value.buildingId) 
+            if (value.conferenceRoomId == conferenceRoomId  && value.floorId==floorId && value.buildingId==buildingId) 
                 flag = true
         })
 
