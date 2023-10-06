@@ -1,7 +1,7 @@
 export class User{
     userId: string
     constructor(userId: string){
-        this.userId = userId//Math.random()
+        this.userId = userId //Math.random()
     }
 }
 

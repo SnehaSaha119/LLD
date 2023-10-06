@@ -4,13 +4,7 @@ export class Building {
     buildingId: string = ''
     floors: Floor [] = []
 
-    // constructor(
-    //     buildingId:string,
-    //     floors: Floor[]){
-
-    //     this.buildingId = buildingId,
-    //     this.floors = floors
-    // }
+    //During interview mention buildingname, buildingDetails, etc as metadata of buidling class
 }
 
 // import {Entity, OneToMany, PrimaryGeneratedColumn} from "typeorm"; 

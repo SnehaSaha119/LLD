@@ -1,10 +1,11 @@
 import { Booking } from "./booking"
 import { Floor } from "./floor"
+import { Slot } from "./slot"
 
 export class Conference{
     conferenceRoomId: string = ''
-    //capacity: number = 0
-    bookedSlot: { [key: string] : string } = {} //list of free slot or list of booked slots or dic for date and slot
+    capacity: number = 0
+    bookedSlots: Slot[] = []
     floorId: string = ''
     buildingId: string = ''
 

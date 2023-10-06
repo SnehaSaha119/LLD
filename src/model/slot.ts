@@ -1,11 +1,5 @@
-import { Conference } from "./conference"
-
 export class Slot{
-    slotTime: string
+    startTime: number = 0
+    endTime: number = 0
     //dateOfBooking : later
-    constructor(
-        slotTime: string){
-
-        this.slotTime = slotTime
-    }
 }

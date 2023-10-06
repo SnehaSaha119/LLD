@@ -1,28 +1,26 @@
 import { Slot } from "../model/slot";
-import { RepositoryDataManipulation } from "../repository/repositoryDataManipulation";
+import { slotRepository } from "../config/storage"
+import { SlotServiceInterface } from "../interface/slotServiceInterface";
 
-export class SlotService {
-    repositoryDataManipulation: RepositoryDataManipulation
-    constructor(repositoryDataManipulation : RepositoryDataManipulation){
-        this.repositoryDataManipulation = repositoryDataManipulation
-    }
+export class SlotService implements SlotServiceInterface {
+    slotRepository = slotRepository
 
-    slotExists(slotTime: string) {
-
-        let slotList = this.repositoryDataManipulation.listSlots()
-        let flag = false
+    slotExists(slotTime: string): Boolean {
+        let slotTimeNo = slotTime.split('-').map((value)=>Number(value))
+        let slotList = this.slotRepository.listSlots()
+        let slotFound = false
         slotList.filter((value: Slot) => {
-            if (value.slotTime == slotTime) 
-                flag = true
+            if (value.startTime == slotTimeNo[0] && value.endTime == slotTimeNo[1]) 
+                slotFound = true
         })
 
-        return flag ? true : false
+        return slotFound
     }
 
-    addSlot(slotTime: string) {
+    addSlot(slotTime: string): Slot {
+        let slotTimeNo = slotTime.split('-').map((value)=>Number(value))
+        let slotTimeReceived = this.slotRepository.addSlot(slotTimeNo[0],slotTimeNo[1])
 
-        this.repositoryDataManipulation.addSlot(slotTime)
-
-        return 'Successfully added slot'
+        return slotTimeReceived
     }
 }

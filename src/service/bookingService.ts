@@ -1,56 +1,91 @@
+import { bookingRepository } from "../config/storage";
 import { BookingStatus } from "../enum/bookingStatus";
 import { Booking } from "../model/booking";
-import { Slot } from "../model/slot";
-import { RepositoryDataManipulation } from "../repository/repositoryDataManipulation";
 
 export class BookingService {
-    repositoryDataManipulation: RepositoryDataManipulation
-    constructor(repositoryDataManipulation : RepositoryDataManipulation){
-        this.repositoryDataManipulation = repositoryDataManipulation
+    bookingRepository = bookingRepository
+
+    isBookingExists(slotTime: string,conferenceRoomId: string,floorId: string, buildingId: string): Boolean {
+        try{
+            let bookingList = this.bookingRepository.listBookings()
+            let slotTimeNo = slotTime.split('-').map((value)=>Number(value))
+            let bookingFound = false
+            bookingList.filter((value: Booking) => {
+                if (value.slotTime.startTime == slotTimeNo[0] && value.slotTime.endTime == slotTimeNo[1] && value.conferenceRoom.conferenceRoomId == conferenceRoomId  && value.conferenceRoom.floorId==floorId && value.conferenceRoom.buildingId == buildingId && value.bookingStatus == BookingStatus.ACTIVE) 
+                bookingFound = true
+            })
+            return bookingFound
+        }catch(error){
+            console.error('BookingService | Error | While checking booking exists')
+            throw error
+        }
     }
 
-    bookingExists(userId: string, slotTime: string,conferenceRoomId: string,floorId: string, buildingId: string) {
-
-        let bookingList = this.repositoryDataManipulation.listBookings()
-        let flag = false
-        bookingList.filter((value: Booking) => {
-            if (value.userId == userId && value.slotTime == slotTime && value.conferenceRoom.conferenceRoomId == conferenceRoomId  && value.conferenceRoom.floorId==floorId && value.conferenceRoom.buildingId == buildingId && value.bookingStatus == BookingStatus.ACTIVE) 
-                flag = true
-        })
-
-        return flag ? true : false
+    isBookingExistsForCancellation(bookingId: string): Boolean {
+        try{
+            let bookingList = this.bookingRepository.listBookings()
+            let bookingFound = false
+            bookingList.forEach((value: Booking) => {
+                if (value.bookingId == bookingId && value.bookingStatus == BookingStatus.ACTIVE) 
+                    bookingFound = true
+            })
+            return bookingFound
+        }catch(error){
+            console.error('BookingService | Error | While checking booking exists')
+            throw error
+        }
     }
 
-    addBooking(userId: string, slotTime: string, conferenceRoomId: string,floorId: string,buildingId: string) {
-
-        this.repositoryDataManipulation.addBooking(userId,slotTime,conferenceRoomId,floorId,buildingId)
-
-        return 'Successfully added conference'
+    addBooking(userId: string, slotTime: string, conferenceRoomId: string,floorId: string,buildingId: string): Booking {
+        try{
+            let bookingReceived = this.bookingRepository.addBooking(userId,slotTime,conferenceRoomId,floorId,buildingId)
+            console.log('BookingService | Successfully added booking')
+            return bookingReceived
+        }catch(error){
+            console.error('BookingService | Error | While adding booking')
+            throw error
+        }
     }
 
-    bookingAlreadyCancelled(userId: string, slotTime: string,conferenceRoomId: string,floorId: string, buildingId: string) {
-
-        let bookingList = this.repositoryDataManipulation.listBookings()
-        let flag = false
-        bookingList.filter((value: Booking) => {
-            if (value.userId == userId && value.slotTime == slotTime && value.conferenceRoom.conferenceRoomId == conferenceRoomId  && value.conferenceRoom.floorId==floorId && value.conferenceRoom.buildingId == buildingId && value.bookingStatus == BookingStatus.CANCEL) 
-                flag = true
-        })
-
-        return flag ? true : false
+    isBookingAlreadyCancelled(userId: string, slotTime: string,conferenceRoomId: string,floorId: string, buildingId: string,bookingId: string): boolean {
+        try{
+            let bookingList = this.bookingRepository.listBookings()
+            let slotTimeNo = slotTime.split('-').map((value)=>Number(value))
+            let bookingCancelled = false
+            bookingList.filter((value: Booking) => {
+                if (value.bookingId==bookingId && value.userId == userId && value.slotTime.startTime == slotTimeNo[0] && value.slotTime.endTime == slotTimeNo[1]  && value.conferenceRoom.conferenceRoomId == conferenceRoomId  && value.conferenceRoom.floorId==floorId && value.conferenceRoom.buildingId == buildingId && value.bookingStatus == BookingStatus.CANCEL) 
+                    bookingCancelled = true
+            })
+            return bookingCancelled
+        }catch(error){
+            console.error('BookingService | Error | While checking booking already cancelled')
+            throw error
+        }
     }
 
-    cancelBooking(userId: string, slotTime: string,conferenceRoomId: string,floorId: string,buildingId: string){
-
-        this.repositoryDataManipulation.cancelBooking(userId,slotTime,conferenceRoomId,floorId,buildingId)
-
-        return 'Successfully cancelled booking'
+    cancelBooking(userId: string, slotTime: string,conferenceRoomId: string,floorId: string,buildingId: string,bookingId: string): Booking|undefined{
+        try{
+            let bookingUpdated = this.bookingRepository.cancelBooking(userId,slotTime,conferenceRoomId,floorId,buildingId,bookingId)
+            if(!bookingUpdated){
+                console.warn('BookingService | Booking was not cancelled due to error')
+                return
+            }
+            console.log('BookingService | Successfully cancelled booking')
+            return bookingUpdated
+        }catch(error){
+            console.error('BookingService | Error | While cancelling booking')
+            throw error
+        }
     }
 
     listBookingByUser(userId: string,floorId: string,buildingId: string){
-
-        let result = this.repositoryDataManipulation.listBookingsByUser(userId,floorId,buildingId)
-
-        return result
+        try{
+            let result = this.bookingRepository.listBookingsByUser(userId,floorId,buildingId)
+            console.log('BookingService | Successfully listed booking')
+            return result
+        }catch(error){
+            console.error('BookingService | Error | While listing booking')
+            throw error
+        }
     }
 }

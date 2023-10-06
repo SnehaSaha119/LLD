@@ -1,21 +1,9 @@
-import { Building } from "./building"
 import { Conference } from "./conference"
 
 export class Floor{
     floorId: string = ''
-    conferenceRooms : Conference[] = []
+    conference : Conference[] = []
     buildingId: string = ''
-    
-    // constructor(
-    //     floorId: string,
-    //     conferenceRooms: Conference [],
-    //     buildingId: string
-    // ){
-
-    //     this.floorId = floorId
-    //     this.conferenceRooms = conferenceRooms
-    //     this.buildingId = buildingId
-    // }
 }
 
 // import {Column, Entity, OneToMany, PrimaryGeneratedColumn} from "typeorm"; 

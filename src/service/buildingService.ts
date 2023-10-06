@@ -1,28 +1,56 @@
 import { Building } from "../model/building";
-import { RepositoryDataManipulation } from "../repository/repositoryDataManipulation";
+import { Floor } from "../model/floor";
+import { buildingRepository } from '../config/storage'
 
 export class BuildingService {
-    repositoryDataManipulation: RepositoryDataManipulation
-    constructor(repositoryDataManipulation : RepositoryDataManipulation){
-        this.repositoryDataManipulation = repositoryDataManipulation
+
+    buildingRepository = buildingRepository
+
+    isBuildingExists(buildingId: string):Boolean{
+        try{
+            let buildingList = this.buildingRepository.listBuildings()
+            let buildFound = false
+            buildingList.filter((value: Building) => {
+                if (value.buildingId == buildingId) 
+                buildFound = true
+            })
+            return buildFound
+        }catch(error){
+            console.error('BuildingService | Error | While checking building exists')
+            throw error
+        }
     }
 
-    buildingExists(buildingId: string) {
-
-        let buildingList = this.repositoryDataManipulation.listBuildings()
-        let flag = false
-        buildingList.filter((value: Building) => {
-            if (value.buildingId == buildingId) 
-                flag = true
-        })
-
-        return flag ? true : false
+    addBuilding(buildingId: string) : Building{
+        try{
+            let buildingReceived = this.buildingRepository.addBuilding(buildingId)
+            console.log('BuildingService | Successfully added building')
+            return buildingReceived
+        }catch(error){
+            console.error('BuildingService | Error | While adding building')
+            throw error
+        }
+    }
+    
+    updateBuildingFloor(buildingId: string, floor: Floor): Building | undefined{
+        try{
+            let updatedBuildingReceived = this.buildingRepository.updateBuildingFloor(buildingId,floor)
+            console.log('BuildingService | Successfully updated building floor')
+            return updatedBuildingReceived
+        }catch(error){
+            console.error('BuildingService | Error | While updating floor of building')
+            throw error
+        }
     }
 
-    addBuilding(buildingId: string) {
-
-        this.repositoryDataManipulation.addBuilding(buildingId)
-
-        return 'Successfully added building'
+    listBuildings(): Building[]{
+        try{
+            let buildingsReceived = this.buildingRepository.listBuildings()
+            console.log('BuildingService | Successfully listed buildings')
+            return buildingsReceived
+        }catch(error){
+            console.error('BuildingService | Error | While listing buildings')
+            throw error
+        }
     }
 }
