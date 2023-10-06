@@ -9,12 +9,12 @@ export class ConferenceHandler {
     floorService = new FloorService
     buildingService = new BuildingService
     constructor() {
-        this.router.post('/conferences', this.addConference)
+        this.router.post('/conference-rooms', this.addConference)
         this.router.get('/conferences',this.listConferences)
-        this.router.get('/conferences/slot',this.listConferencesBySlot)
-        this.router.get('/conferences/slot-capacity',this.listConferencesBySlotAndCapacity)
-        this.router.patch('/conferences/:conferenceId',this.updateConferenceBookedSlot)
-        this.router.post('/conferences/:conferenceId/cancellation',this.cancelConferenceBookedSlot)
+        this.router.get('/conference-rooms',this.listConferencesBySlot)
+        this.router.get('/conference-rooms',this.listConferencesBySlotAndCapacity)
+        this.router.patch('/conference-rooms/:conferenceId',this.updateConferenceBookedSlot)
+        this.router.put('/conference-rooms/:conferenceId/cancellation',this.cancelConferenceBookedSlot)
     }
 
     addConference = async (req: Request, res: Response) => {
@@ -118,7 +118,7 @@ export class ConferenceHandler {
             console.log(`Conferences listed ${JSON.stringify(conferencesReceived)}`)
             return res.status(201).send({
                 Status: 200,
-                Message:'Conference listed',
+                Message:'Conference listed for all',
                 data: conferencesReceived
             })  
         } catch (error) {
@@ -166,13 +166,13 @@ export class ConferenceHandler {
                 console.warn("ConferenceHandler | No rooms available")
                 return res.status(201).send({
                     Status: 200,
-                    Message:'No rooms available'
+                    Message:'No rooms available based on slotTime'
                 })  
             }else{
                 console.warn(`ConferenceHandler | rooms available ${conferenceReceived}`)
                 return res.status(201).send({
                     Status: 200,
-                    Message:'Rooms available',
+                    Message:'Rooms available based on slotTime',
                     data: conferenceReceived
                 })
             }
@@ -228,13 +228,13 @@ export class ConferenceHandler {
                 console.warn("ConferenceHandler | No rooms available")
                 return res.status(201).send({
                     Status: 200,
-                    Message:'No rooms available'
+                    Message:'No rooms available based on slotTime and capacity'
                 })  
             }else{
                 console.warn(`ConferenceHandler | rooms available ${conferenceReceived}`)
                 return res.status(201).send({
                     Status: 200,
-                    Message:'Rooms available',
+                    Message:'Rooms available based on slotTime and capacity',
                     data: conferenceReceived
                 })
             }
@@ -324,8 +324,8 @@ export class ConferenceHandler {
 
             console.log("ConferenceHandler | Successfully updated Conference booked slot")
 
-            return res.status(201).send({
-                Status: 201,
+            return res.status(200).send({
+                Status: 200,
                 Message:'Conference booked slot updated',
                 Data: updatedConferenceReceived
             }) 
@@ -413,8 +413,8 @@ export class ConferenceHandler {
 
             console.log("ConferenceHandler | Successfully updated Conference booked slot")
 
-            return res.status(201).send({
-                Status: 201,
+            return res.status(200).send({
+                Status: 200,
                 Message:'Conference booked slot updated',
                 Data: cancelConferenceReceived
             }) 

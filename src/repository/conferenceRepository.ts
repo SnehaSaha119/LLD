@@ -25,11 +25,14 @@ export class ConferenceRepository{
             let slotTimeNo = slotTime.split('-').map((value)=>Number(value))
             let result: string[] = []
             this.conferences.forEach((conference)=>{
-                if(!(conference.floorId == floorId && conference.buildingId == buildingId)) {
-                    conference.bookedSlots.forEach((slot)=>{
-                        if(!(slot.startTime==slotTimeNo[0] && slot.endTime==slotTimeNo[1]) && ((slot.startTime>slotTimeNo[0] && slot.startTime>slotTimeNo[1]) || (slot.endTime<slotTimeNo[0] && slot.endTime<slotTimeNo[1])))
-                            result.push(conference.conferenceRoomId)
-                    })
+                if(conference.floorId == floorId && conference.buildingId == buildingId) {
+                    if(conference.bookedSlots.length==0) result.push(conference.conferenceRoomId)
+                    else{
+                        conference.bookedSlots.forEach((slot)=>{
+                            if(!(slot.startTime==slotTimeNo[0] && slot.endTime==slotTimeNo[1]) && ((slot.startTime>slotTimeNo[0] && slot.startTime>slotTimeNo[1]) || (slot.endTime<slotTimeNo[0] && slot.endTime<slotTimeNo[1])))
+                                result.push(conference.conferenceRoomId)
+                        })
+                    }
                 }
                     
             })
@@ -45,11 +48,14 @@ export class ConferenceRepository{
             let slotTimeNo = slotTime.split('-').map((value)=>Number(value))   
             let result: string[] = []
             this.conferences.forEach((conference)=>{
-                if(!(conference.floorId == floorId && conference.buildingId == buildingId && conference.capacity >= capacity)){
-                    conference.bookedSlots.forEach((slot)=>{
-                        if(!(slot.startTime==slotTimeNo[0] && slot.endTime==slotTimeNo[1]) && ((slot.startTime>slotTimeNo[0] && slot.startTime>slotTimeNo[1]) || (slot.endTime<slotTimeNo[0] && slot.endTime<slotTimeNo[1])))
-                            result.push(conference.conferenceRoomId)
-                    })
+                if(conference.floorId == floorId && conference.buildingId == buildingId && conference.capacity >= capacity){
+                    if(conference.bookedSlots.length==0) result.push(conference.conferenceRoomId)
+                    else{
+                        conference.bookedSlots.forEach((slot)=>{
+                            if(!(slot.startTime==slotTimeNo[0] && slot.endTime==slotTimeNo[1]) && ((slot.startTime>slotTimeNo[0] && slot.startTime>slotTimeNo[1]) || (slot.endTime<slotTimeNo[0] && slot.endTime<slotTimeNo[1])))
+                                result.push(conference.conferenceRoomId)
+                        })
+                    }
                 }
             })
             return result

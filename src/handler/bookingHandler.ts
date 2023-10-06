@@ -13,7 +13,7 @@ export class BookingHandler{
     constructor() {
         this.router.post('/bookings', this.addBooking)
         this.router.get('/bookings',this.listBookingByUser)
-        this.router.post('/bookings/:bookingId/cancellation',this.cancelBooking)
+        this.router.put('/bookings/:bookingId/cancellation',this.cancelBooking)
     }
 
     addBooking = async (req: Request, res: Response) => {
@@ -259,6 +259,14 @@ export class BookingHandler{
             }
             
             let bookingUpdated = this.bookingService.cancelBooking(userId,slotTime,conferenceId,floorId,buildingId,bookingId)
+            if(!bookingUpdated){
+                console.warn("BookingHandler | cannot cancel booking")
+                return res.status(400).send({
+                    Status: 400,
+                    Message:'cannot cancel booking'
+                })  
+
+            }
 
             console.log(` -- Cancelled booking ${bookingUpdated}`)
 
@@ -275,8 +283,8 @@ export class BookingHandler{
             }
             console.log("BookingHandler | Successfully cancelled conference booked slot")
 
-            return res.status(201).send({
-                Status: 201,
+            return res.status(200).send({
+                Status: 200,
                 Message:'Booking cancelled'
             }) 
 
