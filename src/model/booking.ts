@@ -8,20 +8,4 @@ export class Booking {
     userId: string = ''
     slotTime: Slot = new Slot
     conferenceRoom: Conference = new Conference()
-
-    // constructor(
-    //     bookingId: string,
-    //     bookingStatus: BookingStatus,
-    //     userId: string,
-    //     slotTime: string,
-    //     conferenceRoom: Conference
-        
-    //     ){
-        
-    //     this.bookingId = bookingId
-    //     this.bookingStatus = bookingStatus
-    //     this.slotTime = slotTime
-    //     this.userId = userId
-    //     this.conferenceRoom = conferenceRoom
-    //}
 }
