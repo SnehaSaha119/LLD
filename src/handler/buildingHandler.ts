@@ -24,7 +24,7 @@ export class BuildingHandler {
                 })
             }
 
-            if(this.buildingService.isBuildingExists(buildingId)){
+            if(await this.buildingService.isBuildingExists(buildingId)){
                 return res.status(400).send({
                     Status: 400,
                     Message:'Building already exists',
@@ -32,7 +32,7 @@ export class BuildingHandler {
                 })      
             }
             
-            let result = this.buildingService.addBuilding(buildingId)  
+            let result = await this.buildingService.addBuilding(buildingId)  
             console.log(` -- Added building ${JSON.stringify(result)}`)
 
             return res.status(201).send({
@@ -106,7 +106,7 @@ export class BuildingHandler {
 
         try {
 
-            let result = this.buildingService.listBuildings()  
+            let result = await this.buildingService.listBuildings()  
             console.log(` -- Listed buildings ${JSON.stringify(result)}`)
 
             return res.status(201).send({

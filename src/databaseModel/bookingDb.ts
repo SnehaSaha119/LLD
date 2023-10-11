@@ -3,24 +3,22 @@ import { Floor } from "../model/floor";
 import { Slot } from "../model/slot";
 import { BookingStatus } from "../enum/bookingStatus";
 import { Conference } from "../model/conference";
+import { ConferenceDb } from "./conferenceDb";
 
-@Entity()
+@Entity({name: 'booking_db'})
 export class BookingDb {
     @PrimaryGeneratedColumn()
     bookingId!: string
 
-    @ManyToOne(()=>Floor,(floor: Floor)=>floor.floorId)
-    floorId!: []
-
     @Column()
     userId!: string
 
-    @Column()
-    bookedSlot!: Slot[]
+    @Column("simple-json")
+    bookedSlot!: {startTime: number, endTime:number}
 
     @Column()
     bookingStatus!: BookingStatus
     
-    @OneToOne(()=>Conference,(conference: Conference)=>conference.conferenceRoomId)
+    @OneToOne(()=>ConferenceDb,(conference: ConferenceDb)=>conference.conferenceRoomId)
     conferenceRoomId!: string
 }

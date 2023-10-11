@@ -1,29 +1,27 @@
 import { Floor } from "../model/floor";
 import { floorRepository } from '../config/storage'
 import { Conference } from "../model/conference";
+import { FloorRepositoryDb } from "../repositoryDb/floorRepositoryDb";
+import { FloorDb } from "../databaseModel/floorDb";
 
 export class FloorService {
-    floorRepository = floorRepository
+    floorRepository = new FloorRepositoryDb()
 
-    isFloorExists(floorId: string, buildingId: string): Boolean {
+    async isFloorExists(floorId: string, buildingId: string): Promise<Boolean> {
         try{
-            let floorList = this.floorRepository.listFloors()
-            let floorFound = false
-            floorList.filter((value: Floor) => {
-                if (value.buildingId == buildingId  && value.floorId==floorId) 
-                    floorFound = true
-            })
-            return floorFound
+            let floorList = await this.floorRepository.listFloor(floorId,buildingId)
+            
+            return (floorList) ? true : false
         }catch(error){
             console.error('FloorService | Error | While checking floor exits')
             throw error
         }
     }
 
-    addFloor(floorId: string,buildingId: string) {
+    async addFloor(floorId: string,buildingId: string):Promise<FloorDb> {
         try{
-            let floorReceived = this.floorRepository.addFloor(floorId,buildingId)
-            console.log("FloorService | Successfully added floor")
+            let floorReceived = await this.floorRepository.addFloor(floorId,buildingId)
+            console.log("FloorService | Successfully added floor",JSON.stringify(floorReceived))
             return floorReceived
         }catch(error){
             console.error('FloorService | Error | While checking floor exits')
@@ -42,10 +40,10 @@ export class FloorService {
         }
     }
 
-    listFloors(): Floor[]{
+    async listFloors(): Promise<FloorDb[]>{
         try{
-            let floorsReceived = this.floorRepository.listFloors()
-            console.log('FloorService | Successfully listed floors')
+            let floorsReceived = await this.floorRepository.listFloors()
+            console.log('FloorService | Successfully listed floors',JSON.stringify(floorsReceived))
             return floorsReceived
         }catch(error){
             console.error('FloorService | Error | While listing floors')

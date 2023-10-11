@@ -1,14 +1,15 @@
-import {Column, Entity, ManyToOne, PrimaryGeneratedColumn} from "typeorm"; 
+import {Column, Entity, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn} from "typeorm"; 
 import { Floor } from "../model/floor";
 import { Slot } from "../model/slot";
+import { FloorDb } from "./floorDb";
 
-@Entity()
+@Entity({name: 'conference_db'})
 export class ConferenceDb {
-    @PrimaryGeneratedColumn()
+    @PrimaryColumn()
     conferenceRoomId!: string
 
-    @ManyToOne(()=>Floor,(floor: Floor)=>floor.floorId)
-    floorId!: []
+    @ManyToOne(()=>FloorDb,(floor: FloorDb)=>floor.floorId)
+    floorId!: string
 
     @Column()
     buildingId!: string
@@ -16,6 +17,6 @@ export class ConferenceDb {
     @Column()
     capacity!: number
     
-    @Column()
+    @Column("jsonb",{nullable: true})
     bookedSlot!: Slot[]
 }

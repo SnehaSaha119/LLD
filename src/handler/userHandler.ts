@@ -24,7 +24,7 @@ export class UserHandler {
                 })
             }
 
-            if(this.userService.isUserExists(userId)){
+            if(await this.userService.isUserExists(userId)){
                 return res.status(400).send({
                     Status: 400,
                     Message:'User already exists',
@@ -32,7 +32,7 @@ export class UserHandler {
                 })      
             }
             
-            let result = this.userService.addUser(userId)       
+            let result = await this.userService.addUser(userId)       
             console.log(` -- Added user ${JSON.stringify(result)}`)
 
             return res.status(201).send({
@@ -55,8 +55,8 @@ export class UserHandler {
 
         try {
             
-            let result = this.userService.listUsers()       
-            console.log(` -- Listed users ${result}`)
+            let result = await this.userService.listUsers()       
+            console.log(` -- Listed users ${JSON.stringify(result)}`)
 
             res.status(201).send({
                 Status: 201,

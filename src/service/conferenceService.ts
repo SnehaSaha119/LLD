@@ -1,27 +1,24 @@
 import { Conference } from "../model/conference";
 import { conferenceRepository } from "../config/storage"
+import { ConferenceRepositoryDb } from "../repositoryDb/conferenceRepositoryDb";
+import { ConferenceDb } from "../databaseModel/conferenceDb";
 
 export class ConferenceService {
-    conferenceRepository = conferenceRepository
+    conferenceRepository = new ConferenceRepositoryDb
 
-    isConferenceExists(conferenceRoomId: string,floorId: string, buildingId: string,capacity?: number): Boolean {
+    async isConferenceExists(conferenceRoomId: string,floorId: string, buildingId: string,capacity?: number): Promise<Boolean> {
         try{
-            let conferenceList = this.conferenceRepository.listConferences()
-            let conferenceFound = false
-            conferenceList.filter((value: Conference) => {
-                if (value.conferenceRoomId == conferenceRoomId  && value.floorId==floorId && value.buildingId==buildingId)
-                    conferenceFound = (capacity!=undefined) ? ((value.capacity == capacity) ? true : false) : true
-            })
-            return conferenceFound
+            let conferenceList = await this.conferenceRepository.listConference(conferenceRoomId,floorId,buildingId)
+            return (conferenceList) ? true : false
         }catch(error){
             console.error('ConferenceService | Error | While checking conference exits')
             throw error
         }
     }
 
-    addConference(conferenceRoomId: string,floorId: string,buildingId: string,capacity: number): Conference {
+    async addConference(conferenceRoomId: string,floorId: string,buildingId: string,capacity: number): Promise<ConferenceDb> {
         try{
-            let conferenceReceived = this.conferenceRepository.addConference(conferenceRoomId,floorId,buildingId,capacity)
+            let conferenceReceived = await this.conferenceRepository.addConference(conferenceRoomId,floorId,buildingId,capacity)
             console.log('ConferenceService | Successfully added conference')
             return conferenceReceived
         }catch(error){
@@ -30,9 +27,9 @@ export class ConferenceService {
         }
     }
 
-    listConferences() {
+    async listConferences(): Promise<ConferenceDb[]> {
         try{
-            let result = this.conferenceRepository.listConferences()
+            let result = await this.conferenceRepository.listConferences()
             return result
         }catch(error){
             console.error('ConferenceService | Error | While listing conferences')
@@ -40,19 +37,9 @@ export class ConferenceService {
         }
     }
 
-    listConferencesBySlot(slotTime: string,floorId: string,buildingId: string) {
+    async listConferencesBySlotAndCapacity(slotTime: string,floorId: string,buildingId: string,capacity?: number):Promise<ConferenceDb[]> {
         try{
-            let result = this.conferenceRepository.listConferencesBySlot(slotTime,floorId,buildingId)
-            return result
-        }catch(error){
-            console.error('ConferenceService | Error | While listConferencesBySlot')
-            throw error
-        }
-    }
-
-    listConferencesBySlotAndCapacity(slotTime: string,floorId: string,buildingId: string,capacity: number) {
-        try{
-            let result = this.conferenceRepository.listConferencesBySlotAndCapacity(slotTime,floorId,buildingId,capacity)
+            let result = await this.conferenceRepository.listConferencesBySlotANDCapacity(slotTime,floorId,buildingId,capacity)
             return result
         }catch(error){
             console.error('ConferenceService | Error | While listConferencesBySlotAndCapacity')
@@ -90,14 +77,14 @@ export class ConferenceService {
             let slotStartTimeReceived = slotTimeReceived[0]
             let slotEndTimeReceived = slotTimeReceived[1]
 
-            conferencesList.forEach((conference: Conference) => {
-                if (conference.conferenceRoomId == conferenceRoomId  && conference.floorId==floorId && conference.buildingId == buildingId) {
-                    conference.bookedSlots.forEach((bookedSlot)=>{
-                        if((slotStartTimeReceived>bookedSlot.endTime && slotEndTimeReceived>bookedSlot.endTime) || (slotStartTimeReceived<bookedSlot.startTime && slotEndTimeReceived<bookedSlot.startTime)){}
-                        else overlap = true
-                    })
-                }       
-            })
+            // conferencesList.forEach((conference: Conference) => {
+            //     if (conference.conferenceRoomId == conferenceRoomId  && conference.floorId==floorId && conference.buildingId == buildingId) {
+            //         conference.bookedSlots.forEach((bookedSlot)=>{
+            //             if((slotStartTimeReceived>bookedSlot.endTime && slotEndTimeReceived>bookedSlot.endTime) || (slotStartTimeReceived<bookedSlot.startTime && slotEndTimeReceived<bookedSlot.startTime)){}
+            //             else overlap = true
+            //         })
+            //     }       
+            // })
 
             return overlap
         }catch(error){

@@ -1,12 +1,13 @@
 
-import {Column, Entity, OneToMany, PrimaryGeneratedColumn} from "typeorm"; 
+import {Column, Entity, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn} from "typeorm"; 
 import { Building } from "../model/building";
+import { BuildingDb } from "./buildingDb";
 
-@Entity()
+@Entity({name: 'floor_db'})
 export class FloorDb{
-    @PrimaryGeneratedColumn()
+    @PrimaryColumn()
     floorId!: string
 
-    @OneToMany(()=>Building,(building: Building)=>building.buildingId)
+    @ManyToOne(()=>BuildingDb,(building: BuildingDb)=>building.buildingId)
     buildingId!: string
 }

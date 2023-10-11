@@ -34,7 +34,7 @@ export class FloorHandler {
                 })
             }
 
-            if(this.floorService.isFloorExists(floorId,buildingId)){
+            if(await this.floorService.isFloorExists(floorId,buildingId)){
                 return res.status(400).send({
                     Status: 400,
                     Message:'Floor already exists',
@@ -42,7 +42,7 @@ export class FloorHandler {
                 })      
             }
 
-            if(!this.buildingService.isBuildingExists(buildingId)){
+            if(! (await this.buildingService.isBuildingExists(buildingId))){
                 return res.status(400).send({
                     Status: 400,
                     Message:'Building doesnt exists',
@@ -50,23 +50,23 @@ export class FloorHandler {
                 })      
             }
             
-            let floorReceived = this.floorService.addFloor(floorId,buildingId)
+            let floorReceived = await this.floorService.addFloor(floorId,buildingId)
 
             console.log(` -- Added floor ${JSON.stringify(floorReceived)}`)
 
-            // Update building with the floor
-            let updatedBuildingReceived = this.buildingService.updateBuildingFloor(floorReceived.buildingId,floorReceived)
+            // // Update building with the floor
+            // let updatedBuildingReceived = this.buildingService.updateBuildingFloor(floorReceived.buildingId,floorReceived)
 
-            // Pending - Update floor if floor missing
+            // // Pending - Update floor if floor missing
 
-            if(!updatedBuildingReceived){
-                console.warn("floorHandler | Building floor was not updated")
-                return res.status(400).send({
-                    Status: 400,
-                    Message:'Building floor was not updated'
-                })  
+            // if(!updatedBuildingReceived){
+            //     console.warn("floorHandler | Building floor was not updated")
+            //     return res.status(400).send({
+            //         Status: 400,
+            //         Message:'Building floor was not updated'
+            //     })  
 
-            }
+            // }
 
             console.log("floorHandler | Successfully updated building floor")
 
@@ -169,7 +169,7 @@ export class FloorHandler {
 
         try {
     
-            let floorsReceived = this.floorService.listFloors()
+            let floorsReceived = await this.floorService.listFloors()
 
             console.log(` -- Listed floors ${JSON.stringify(floorsReceived)}`)
 

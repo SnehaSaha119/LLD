@@ -9,12 +9,11 @@ export class ConferenceHandler {
     floorService = new FloorService
     buildingService = new BuildingService
     constructor() {
-        this.router.post('/conferences', this.addConference)
-        this.router.get('/conferences',this.listConferences)
-        this.router.get('/conferences/slot',this.listConferencesBySlot)
-        this.router.get('/conferences/slot-capacity',this.listConferencesBySlotAndCapacity)
-        this.router.patch('/conferences/:conferenceId',this.updateConferenceBookedSlot)
-        this.router.post('/conferences/:conferenceId/cancellation',this.cancelConferenceBookedSlot)
+        this.router.post('/conference-rooms', this.addConference)
+        this.router.get('/conference-rooms',this.listConferences)
+        this.router.get('/conference-rooms/availability',this.listConferencesBySlotAndCapacity)
+        this.router.patch('/conference-rooms/:conferenceId',this.updateConferenceBookedSlot)
+        this.router.post('/conference-rooms/:conferenceId/cancellation',this.cancelConferenceBookedSlot)
     }
 
     addConference = async (req: Request, res: Response) => {
@@ -53,7 +52,7 @@ export class ConferenceHandler {
                 })
             }
 
-            if(this.conferenceService.isConferenceExists(conferenceId,floorId,buildingId,capacity)){
+            if(await this.conferenceService.isConferenceExists(conferenceId,floorId,buildingId,capacity)){
                 return res.status(400).send({
                     Status: 400,
                     Message:'Conference already exists',
@@ -61,7 +60,7 @@ export class ConferenceHandler {
                 })      
             }
 
-            if(!this.floorService.isFloorExists(floorId,buildingId)){
+            if(! await this.floorService.isFloorExists(floorId,buildingId)){
                 return res.status(400).send({
                     Status: 400,
                     Message:'Floor doesnt exists',
@@ -69,7 +68,7 @@ export class ConferenceHandler {
                 })      
             }
 
-            if(!this.buildingService.isBuildingExists(buildingId)){
+            if(! await this.buildingService.isBuildingExists(buildingId)){
                 return res.status(400).send({
                     Status: 400,
                     Message:'Building doesnt exists',
@@ -77,21 +76,21 @@ export class ConferenceHandler {
                 })      
             }
             
-            let conferenceReceived = this.conferenceService.addConference(conferenceId,floorId,buildingId,capacity)
+            let conferenceReceived = await this.conferenceService.addConference(conferenceId,floorId,buildingId,capacity)
 
             console.log(` -- Added conference ${JSON.stringify(conferenceReceived)}`)
 
-            // Update building with the floor
-            let updatedFloorReceived = this.floorService.updateFloorConference(floorId,buildingId,conferenceReceived)
+            // // Update building with the floor
+            // let updatedFloorReceived = this.floorService.updateFloorConference(floorId,buildingId,conferenceReceived)
 
-            if(!updatedFloorReceived){
-                console.warn("ConferenceHandler | Floor conference was not updated")
-                return res.status(400).send({
-                    Status: 400,
-                    Message:'Floor conference was not updated'
-                })  
+            // if(!updatedFloorReceived){
+            //     console.warn("ConferenceHandler | Floor conference was not updated")
+            //     return res.status(400).send({
+            //         Status: 400,
+            //         Message:'Floor conference was not updated'
+            //     })  
 
-            }
+            // }
             console.log("ConferenceHandler | Successfully updated floor conference")
 
             return res.status(201).send({
@@ -114,7 +113,7 @@ export class ConferenceHandler {
 
         try {
 
-            let conferencesReceived = this.conferenceService.listConferences()
+            let conferencesReceived = await this.conferenceService.listConferences()
             console.log(`Conferences listed ${JSON.stringify(conferencesReceived)}`)
             return res.status(201).send({
                 Status: 200,
@@ -131,60 +130,6 @@ export class ConferenceHandler {
 
     }
 
-
-    listConferencesBySlot = async (req: Request, res: Response) => {
-
-        try {
-            let slotTime = req?.query?.slotTime as string
-            let floorId = req?.query?.floorId as string
-            let buildingId = req?.query?.buildingId as string
-
-            if (!floorId) {
-                return res.status(400).send({
-                    Status: 400,
-                    Message:'Missing floorId'
-                })
-            }
-
-            if (!buildingId) {
-                return res.status(400).send({
-                    Status: 400,
-                    Message:'Missing buildingId'
-                })
-            }
-
-            if (!slotTime) {
-                return res.status(400).send({
-                    Status: 400,
-                    Message:'Missing slotTime'
-                })
-            }
-
-            let conferenceReceived = this.conferenceService.listConferencesBySlot(slotTime,floorId,buildingId)
-
-            if(conferenceReceived.length==0){
-                console.warn("ConferenceHandler | No rooms available")
-                return res.status(201).send({
-                    Status: 200,
-                    Message:'No rooms available'
-                })  
-            }else{
-                console.warn(`ConferenceHandler | rooms available ${conferenceReceived}`)
-                return res.status(201).send({
-                    Status: 200,
-                    Message:'Rooms available',
-                    data: conferenceReceived
-                })
-            }
-        } catch (error) {
-            console.error("Error | ",error)
-            return res.status(500).send({
-                Status: 500,
-                Message:'Internal Server Error'
-            })
-        }
-
-    }
 
     listConferencesBySlotAndCapacity = async (req: Request, res: Response) => {
 
@@ -215,14 +160,7 @@ export class ConferenceHandler {
                 })
             }
 
-            if (!capacity) {
-                return res.status(400).send({
-                    Status: 400,
-                    Message:'Missing capacity'
-                })
-            }
-
-            let conferenceReceived = this.conferenceService.listConferencesBySlotAndCapacity(slotTime,floorId,buildingId,capacity)
+            let conferenceReceived = await this.conferenceService.listConferencesBySlotAndCapacity(slotTime,floorId,buildingId,capacity)
 
             if(conferenceReceived.length==0){
                 console.warn("ConferenceHandler | No rooms available")

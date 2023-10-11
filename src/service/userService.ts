@@ -1,40 +1,39 @@
+import { UserDb } from "../databaseModel/userDb";
 import { User } from "../model/user";
-import { userRepository } from "../config/storage";
+import { UserRepositoryDb } from "../repositoryDb/userRepositoryDb";
 
 export class UserService {
-    userRepository = userRepository
+    userRepository = new UserRepositoryDb()
 
-    isUserExists(userId: string): Boolean {
+    async isUserExists(userId: string): Promise<boolean>{
         try{
-            let userList = this.userRepository.listUsers()
-            let userFound = false
-            userList.find((value: User) => {
-                if (value.userId == userId) 
-                    userFound = true
-            })
-            return userFound
+            let userList = await this.userRepository.listUser(userId)
+            console.log('UserService | Successfully listed existing user', JSON.stringify(userList))
+            
+            return (userList) ? true : false
         }catch(error){
             console.error('UserService | Error | While checking user exists')
             throw error
         }
     }
 
-    addUser(userId: string): User {
+    async addUser(userId: string):Promise<UserDb>{
         try{
-            let userReceived = this.userRepository.addUser(userId)
-            console.log('UserService | Successfully added user')
-            return userReceived
+            let userAdded = await this.userRepository.addUser(userId)
+                
+            console.log('UserService | Successfully added user',JSON.stringify(userAdded))
+            return userAdded
         }catch(error){
             console.error('UserService | Error | While adding user')
             throw error
         }
     }
 
-    listUsers(): User[]{
+    async listUsers():Promise<UserDb[]>{
         try{
-            let usersReceived = this.userRepository.listUsers()
-            console.log('UserService | Successfully listed user')
-            return usersReceived
+            let userList = await this.userRepository.listUsers()
+            console.log('UserService | Successfully listed user',JSON.stringify(userList))
+            return userList
         }catch(error){
             console.error('UserService | Error | While listing user')
             throw error

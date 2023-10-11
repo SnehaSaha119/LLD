@@ -1,30 +1,31 @@
+import { BuildingDb } from "../databaseModel/buildingDb";
 import { Building } from "../model/building";
 import { Floor } from "../model/floor";
-import { buildingRepository } from '../config/storage'
+import { BuildingRepositoryDb } from "../repositoryDb/buildingRepositoryDb";
 
 export class BuildingService {
 
-    buildingRepository = buildingRepository
+    buildingRepository = new BuildingRepositoryDb()
 
-    isBuildingExists(buildingId: string):Boolean{
+    async isBuildingExists(buildingId: string):Promise<Boolean>{
         try{
-            let buildingList = this.buildingRepository.listBuildings()
-            let buildFound = false
-            buildingList.filter((value: Building) => {
-                if (value.buildingId == buildingId) 
-                buildFound = true
-            })
-            return buildFound
+            let buildingList = await this.buildingRepository.listBuilding(buildingId)
+
+            console.log('BuildingService | Successfully listed existing building', JSON.stringify(buildingList))
+            
+            return (buildingList) ? true : false
+
         }catch(error){
             console.error('BuildingService | Error | While checking building exists')
             throw error
         }
     }
 
-    addBuilding(buildingId: string) : Building{
+    async addBuilding(buildingId: string) : Promise<BuildingDb>{
         try{
-            let buildingReceived = this.buildingRepository.addBuilding(buildingId)
-            console.log('BuildingService | Successfully added building')
+
+            let buildingReceived = await this.buildingRepository.addBuilding(buildingId)
+            console.log('BuildingService | Successfully added building',JSON.stringify(buildingReceived))
             return buildingReceived
         }catch(error){
             console.error('BuildingService | Error | While adding building')
@@ -43,10 +44,10 @@ export class BuildingService {
         }
     }
 
-    listBuildings(): Building[]{
+    async listBuildings(): Promise<BuildingDb[]>{
         try{
-            let buildingsReceived = this.buildingRepository.listBuildings()
-            console.log('BuildingService | Successfully listed buildings')
+            let buildingsReceived = await this.buildingRepository.listBuildings()
+            console.log('BuildingService | Successfully listed buildings',JSON.stringify(buildingsReceived))
             return buildingsReceived
         }catch(error){
             console.error('BuildingService | Error | While listing buildings')
